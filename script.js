@@ -7,36 +7,65 @@ const weatherCardsDiv = document.querySelector(".weather-cards");
 const API_KEY = "330206f28353aafff42a4cc0f1064709"; // API key for OpenWeatherMap API
 
 const createWeatherCard = (cityName, weatherItem, index) => {
+    // Convert temperatures from Kelvin to Celsius
+    const temp = (weatherItem.main.temp - 273.15).toFixed(1);
+    const tempMax = (weatherItem.main.temp_max - 273.15).toFixed(1);
+    const tempMin = (weatherItem.main.temp_min - 273.15).toFixed(1);
+    const windSpeed = weatherItem.wind.speed.toFixed(1);
+    const humidity = weatherItem.main.humidity;
+    const feelsLike = (weatherItem.main.feels_like - 273.15).toFixed(1);
+    const pressure = weatherItem.main.pressure;
+    const description = weatherItem.weather[0].description;
+    const icon = weatherItem.weather[0].icon;
+    
     if(index === 0) { // HTML for the main weather card
         return `<div class="details">
                     <h2><i class="fas fa-city"></i> ${cityName} (${weatherItem.dt_txt.split(" ")[0]})</h2>
                     <div class="weather-stats">
                         <div class="stat-item">
                             <i class="fas fa-temperature-high"></i>
-                            <span>Temperature: ${(weatherItem.main.temp - 273.15).toFixed(2)}°C</span>
+                            <span>Temperature: ${temp}°C</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-temperature-arrow-up"></i>
+                            <span>Max Temp: ${tempMax}°C</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-temperature-arrow-down"></i>
+                            <span>Min Temp: ${tempMin}°C</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Feels Like: ${feelsLike}°C</span>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-wind"></i>
-                            <span>Wind: ${weatherItem.wind.speed} M/S</span>
+                            <span>Wind: ${windSpeed} M/S</span>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-droplet"></i>
-                            <span>Humidity: ${weatherItem.main.humidity}%</span>
+                            <span>Humidity: ${humidity}%</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-gauge"></i>
+                            <span>Pressure: ${pressure} hPa</span>
                         </div>
                     </div>
                 </div>
                 <div class="icon">
-                    <img src="https://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
-                    <h6>${weatherItem.weather[0].description}</h6>
+                    <img src="https://openweathermap.org/img/wn/${icon}@4x.png" alt="weather-icon">
+                    <h6>${description}</h6>
                 </div>`;
     } else { // HTML for the other five day forecast card
         return `<li class="card">
                     <h3>(${weatherItem.dt_txt.split(" ")[0]})</h3>
-                    <img src="https://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
+                    <img src="https://openweathermap.org/img/wn/${icon}@4x.png" alt="weather-icon">
                     <div class="card-stats">
-                        <p><i class="fas fa-temperature-high"></i> Temp: ${(weatherItem.main.temp - 273.15).toFixed(2)}°C</p>
-                        <p><i class="fas fa-wind"></i> Wind: ${weatherItem.wind.speed} M/S</p>
-                        <p><i class="fas fa-droplet"></i> Humidity: ${weatherItem.main.humidity}%</p>
+                        <p><i class="fas fa-temperature-high"></i> Temp: ${temp}°C</p>
+                        <p><i class="fas fa-temperature-arrow-up"></i> Max: ${tempMax}°C</p>
+                        <p><i class="fas fa-temperature-arrow-down"></i> Min: ${tempMin}°C</p>
+                        <p><i class="fas fa-wind"></i> Wind: ${windSpeed} M/S</p>
+                        <p><i class="fas fa-droplet"></i> Humidity: ${humidity}%</p>
                     </div>
                 </li>`;
     }
