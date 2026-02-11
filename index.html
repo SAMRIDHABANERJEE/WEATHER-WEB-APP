@@ -1,69 +1,144 @@
 <!DOCTYPE html>
-<!-- Coding By CodingNepal - www.codingnepalweb.com -->
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Weather App Project </title>
+    <title>Weather Dashboard - Real-time Forecasts</title>
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="script.js" defer></script>
   </head>
   <body>
-    <h1>Weather Dashboard</h1>
+    <div class="header-wrapper">
+      <h1><i class="fas fa-cloud-sun"></i> Weather Dashboard</h1>
+      <p class="subtitle">Get real-time weather updates for any location worldwide</p>
+    </div>
+    
     <div class="container">
       <div class="weather-input">
-        <h3>Enter a City Name</h3>
-        <input class="city-input" type="text" placeholder="E.g., New York, London, Tokyo">
-        <button class="search-btn">Search</button>
-        <div class="separator"></div>
-        <button class="location-btn">Use Current Location</button>
+        <div class="input-section">
+          <h3><i class="fas fa-search-location"></i> Search Location</h3>
+          <div class="input-wrapper">
+            <i class="fas fa-map-marker-alt input-icon"></i>
+            <input class="city-input" type="text" placeholder="Enter city name (e.g., New York, London, Tokyo)">
+          </div>
+          <button class="search-btn">
+            <i class="fas fa-search"></i> Search Weather
+          </button>
+          
+          <div class="separator">
+            <span>or</span>
+          </div>
+          
+          <button class="location-btn">
+            <i class="fas fa-location-crosshairs"></i> Use Current Location
+          </button>
+        </div>
+        
+        <div class="info-cards">
+          <div class="info-card">
+            <i class="fas fa-thermometer-half"></i>
+            <div>
+              <h4>Temperature</h4>
+              <p>Real-time data</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-wind"></i>
+            <div>
+              <h4>Wind Speed</h4>
+              <p>Accurate metrics</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-droplet"></i>
+            <div>
+              <h4>Humidity</h4>
+              <p>Live updates</p>
+            </div>
+          </div>
+        </div>
       </div>
+      
       <div class="weather-data">
         <div class="current-weather">
           <div class="details">
-            <h2>_______ ( ______ )</h2>
-            <h6>Temperature: __°C</h6>
-            <h6>Wind: __ M/S</h6>
-            <h6>Humidity: __%</h6>
+            <h2><i class="fas fa-city"></i> _______ ( ______ )</h2>
+            <div class="weather-stats">
+              <div class="stat-item">
+                <i class="fas fa-temperature-high"></i>
+                <span>Temperature: __°C</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-wind"></i>
+                <span>Wind: __ M/S</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-droplet"></i>
+                <span>Humidity: __%</span>
+              </div>
+            </div>
+          </div>
+          <div class="icon">
+            <i class="fas fa-cloud-sun weather-icon-placeholder"></i>
           </div>
         </div>
+        
         <div class="days-forecast">
-          <h2>5-Day Forecast</h2>
+          <h2><i class="fas fa-calendar-week"></i> 5-Day Forecast</h2>
           <ul class="weather-cards">
             <li class="card">
               <h3>( ______ )</h3>
-              <h6>Temp: __C</h6>
-              <h6>Wind: __ M/S</h6>
-              <h6>Humidity: __%</h6>
+              <i class="fas fa-cloud weather-icon-small"></i>
+              <div class="card-stats">
+                <p><i class="fas fa-temperature-high"></i> Temp: __°C</p>
+                <p><i class="fas fa-wind"></i> Wind: __ M/S</p>
+                <p><i class="fas fa-droplet"></i> Humidity: __%</p>
+              </div>
             </li>
             <li class="card">
               <h3>( ______ )</h3>
-              <h6>Temp: __C</h6>
-              <h6>Wind: __ M/S</h6>
-              <h6>Humidity: __%</h6>
+              <i class="fas fa-cloud weather-icon-small"></i>
+              <div class="card-stats">
+                <p><i class="fas fa-temperature-high"></i> Temp: __°C</p>
+                <p><i class="fas fa-wind"></i> Wind: __ M/S</p>
+                <p><i class="fas fa-droplet"></i> Humidity: __%</p>
+              </div>
             </li>
             <li class="card">
               <h3>( ______ )</h3>
-              <h6>Temp: __C</h6>
-              <h6>Wind: __ M/S</h6>
-              <h6>Humidity: __%</h6>
+              <i class="fas fa-cloud weather-icon-small"></i>
+              <div class="card-stats">
+                <p><i class="fas fa-temperature-high"></i> Temp: __°C</p>
+                <p><i class="fas fa-wind"></i> Wind: __ M/S</p>
+                <p><i class="fas fa-droplet"></i> Humidity: __%</p>
+              </div>
             </li>
             <li class="card">
               <h3>( ______ )</h3>
-              <h6>Temp: __C</h6>
-              <h6>Wind: __ M/S</h6>
-              <h6>Humidity: __%</h6>
+              <i class="fas fa-cloud weather-icon-small"></i>
+              <div class="card-stats">
+                <p><i class="fas fa-temperature-high"></i> Temp: __°C</p>
+                <p><i class="fas fa-wind"></i> Wind: __ M/S</p>
+                <p><i class="fas fa-droplet"></i> Humidity: __%</p>
+              </div>
             </li>
             <li class="card">
               <h3>( ______ )</h3>
-              <h6>Temp: __C</h6>
-              <h6>Wind: __ M/S</h6>
-              <h6>Humidity: __%</h6>
+              <i class="fas fa-cloud weather-icon-small"></i>
+              <div class="card-stats">
+                <p><i class="fas fa-temperature-high"></i> Temp: __°C</p>
+                <p><i class="fas fa-wind"></i> Wind: __ M/S</p>
+                <p><i class="fas fa-droplet"></i> Humidity: __%</p>
+              </div>
             </li>
           </ul>
         </div>
       </div>
     </div>
     
+    <footer class="footer">
+      <p><i class="fas fa-info-circle"></i> Powered by OpenWeatherMap API | Real-time weather data</p>
+    </footer>
   </body>
 </html>
