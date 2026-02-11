@@ -9,10 +9,21 @@ const API_KEY = "330206f28353aafff42a4cc0f1064709"; // API key for OpenWeatherMa
 const createWeatherCard = (cityName, weatherItem, index) => {
     if(index === 0) { // HTML for the main weather card
         return `<div class="details">
-                    <h2>${cityName} (${weatherItem.dt_txt.split(" ")[0]})</h2>
-                    <h6>Temperature: ${(weatherItem.main.temp - 273.15).toFixed(2)}°C</h6>
-                    <h6>Wind: ${weatherItem.wind.speed} M/S</h6>
-                    <h6>Humidity: ${weatherItem.main.humidity}%</h6>
+                    <h2><i class="fas fa-city"></i> ${cityName} (${weatherItem.dt_txt.split(" ")[0]})</h2>
+                    <div class="weather-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-temperature-high"></i>
+                            <span>Temperature: ${(weatherItem.main.temp - 273.15).toFixed(2)}°C</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-wind"></i>
+                            <span>Wind: ${weatherItem.wind.speed} M/S</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-droplet"></i>
+                            <span>Humidity: ${weatherItem.main.humidity}%</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="icon">
                     <img src="https://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
@@ -22,15 +33,39 @@ const createWeatherCard = (cityName, weatherItem, index) => {
         return `<li class="card">
                     <h3>(${weatherItem.dt_txt.split(" ")[0]})</h3>
                     <img src="https://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
-                    <h6>Temp: ${(weatherItem.main.temp - 273.15).toFixed(2)}°C</h6>
-                    <h6>Wind: ${weatherItem.wind.speed} M/S</h6>
-                    <h6>Humidity: ${weatherItem.main.humidity}%</h6>
+                    <div class="card-stats">
+                        <p><i class="fas fa-temperature-high"></i> Temp: ${(weatherItem.main.temp - 273.15).toFixed(2)}°C</p>
+                        <p><i class="fas fa-wind"></i> Wind: ${weatherItem.wind.speed} M/S</p>
+                        <p><i class="fas fa-droplet"></i> Humidity: ${weatherItem.main.humidity}%</p>
+                    </div>
                 </li>`;
     }
 }
 
+const showLoading = () => {
+    currentWeatherDiv.innerHTML = `
+        <div class="details" style="text-align: center; width: 100%;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 48px; color: #fff;"></i>
+            <h2 style="margin-top: 20px;">Loading weather data...</h2>
+        </div>
+    `;
+    weatherCardsDiv.innerHTML = "";
+}
+
+const showError = (message) => {
+    currentWeatherDiv.innerHTML = `
+        <div class="details" style="text-align: center; width: 100%;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ffc107;"></i>
+            <h2 style="margin-top: 20px; font-size: 1.5rem;">${message}</h2>
+        </div>
+    `;
+    weatherCardsDiv.innerHTML = "";
+}
+
 const getWeatherDetails = (cityName, latitude, longitude) => {
     const WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`;
+
+    showLoading();
 
     fetch(WEATHER_API_URL).then(response => response.json()).then(data => {
         // Filter the forecasts to get only one forecast per day
@@ -47,36 +82,80 @@ const getWeatherDetails = (cityName, latitude, longitude) => {
         currentWeatherDiv.innerHTML = "";
         weatherCardsDiv.innerHTML = "";
 
-        // Creating weather cards and adding them to the DOM
+        // Creating weather cards and adding them to the DOM with animation
         fiveDaysForecast.forEach((weatherItem, index) => {
             const html = createWeatherCard(cityName, weatherItem, index);
             if (index === 0) {
                 currentWeatherDiv.insertAdjacentHTML("beforeend", html);
+                // Add fade-in animation
+                setTimeout(() => {
+                    currentWeatherDiv.style.opacity = '0';
+                    currentWeatherDiv.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        currentWeatherDiv.style.transition = 'all 0.5s ease';
+                        currentWeatherDiv.style.opacity = '1';
+                        currentWeatherDiv.style.transform = 'scale(1)';
+                    }, 10);
+                }, 10);
             } else {
                 weatherCardsDiv.insertAdjacentHTML("beforeend", html);
+                // Add staggered animation to cards
+                const cards = weatherCardsDiv.querySelectorAll('.card');
+                cards.forEach((card, cardIndex) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, cardIndex * 100);
+                });
             }
         });        
     }).catch(() => {
-        alert("An error occurred while fetching the weather forecast!");
+        showError("An error occurred while fetching the weather forecast!");
     });
 }
 
 const getCityCoordinates = () => {
     const cityName = cityInput.value.trim();
-    if (cityName === "") return;
+    if (cityName === "") {
+        showError("Please enter a city name!");
+        return;
+    }
+    
     const API_URL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
+    
+    // Add loading state to button
+    searchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+    searchButton.disabled = true;
     
     // Get entered city coordinates (latitude, longitude, and name) from the API response
     fetch(API_URL).then(response => response.json()).then(data => {
-        if (!data.length) return alert(`No coordinates found for ${cityName}`);
+        if (!data.length) {
+            showError(`No coordinates found for ${cityName}`);
+            searchButton.innerHTML = '<i class="fas fa-search"></i> Search Weather';
+            searchButton.disabled = false;
+            return;
+        }
         const { lat, lon, name } = data[0];
         getWeatherDetails(name, lat, lon);
+        
+        // Reset button
+        searchButton.innerHTML = '<i class="fas fa-search"></i> Search Weather';
+        searchButton.disabled = false;
     }).catch(() => {
-        alert("An error occurred while fetching the coordinates!");
+        showError("An error occurred while fetching the coordinates!");
+        searchButton.innerHTML = '<i class="fas fa-search"></i> Search Weather';
+        searchButton.disabled = false;
     });
 }
 
 const getUserCoordinates = () => {
+    // Add loading state to button
+    locationButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Location...';
+    locationButton.disabled = true;
+    
     navigator.geolocation.getCurrentPosition(
         position => {
             const { latitude, longitude } = position.coords; // Get coordinates of user location
@@ -85,19 +164,74 @@ const getUserCoordinates = () => {
             fetch(API_URL).then(response => response.json()).then(data => {
                 const { name } = data[0];
                 getWeatherDetails(name, latitude, longitude);
+                
+                // Reset button
+                locationButton.innerHTML = '<i class="fas fa-location-crosshairs"></i> Use Current Location';
+                locationButton.disabled = false;
             }).catch(() => {
-                alert("An error occurred while fetching the city name!");
+                showError("An error occurred while fetching the city name!");
+                locationButton.innerHTML = '<i class="fas fa-location-crosshairs"></i> Use Current Location';
+                locationButton.disabled = false;
             });
         },
         error => { // Show alert if user denied the location permission
+            let errorMessage = "Geolocation request error.";
             if (error.code === error.PERMISSION_DENIED) {
-                alert("Geolocation request denied. Please reset location permission to grant access again.");
-            } else {
-                alert("Geolocation request error. Please reset location permission.");
+                errorMessage = "Location access denied. Please enable location permissions.";
             }
+            showError(errorMessage);
+            locationButton.innerHTML = '<i class="fas fa-location-crosshairs"></i> Use Current Location';
+            locationButton.disabled = false;
         });
 }
+
+// Add smooth scroll behavior
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Add input validation feedback
+cityInput.addEventListener('input', function() {
+    if (this.value.trim() !== '') {
+        this.style.borderColor = '#5372F0';
+    } else {
+        this.style.borderColor = '#e0e0e0';
+    }
+});
+
+// Add enter key animation
+cityInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        searchButton.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            searchButton.style.transform = 'scale(1)';
+        }, 100);
+    }
+});
 
 locationButton.addEventListener("click", getUserCoordinates);
 searchButton.addEventListener("click", getCityCoordinates);
 cityInput.addEventListener("keyup", e => e.key === "Enter" && getCityCoordinates());
+
+// Add initial animation to info cards
+window.addEventListener('load', () => {
+    const infoCards = document.querySelectorAll('.info-card');
+    infoCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0)';
+        }, 1000 + (index * 150));
+    });
+});
