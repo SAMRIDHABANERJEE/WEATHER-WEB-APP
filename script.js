@@ -97,13 +97,48 @@ const getWeatherDetails = (cityName, latitude, longitude) => {
     showLoading();
 
     fetch(WEATHER_API_URL).then(response => response.json()).then(data => {
-        // Filter the forecasts to get only one forecast per day
-        const uniqueForecastDays = [];
-        const fiveDaysForecast = data.list.filter(forecast => {
-            const forecastDate = new Date(forecast.dt_txt).getDate();
-            if (!uniqueForecastDays.includes(forecastDate)) {
-                return uniqueForecastDays.push(forecastDate);
+        // Group forecasts by date and calculate daily max/min temperatures
+        const dailyData = {};
+        
+        data.list.forEach(forecast => {
+            const date = forecast.dt_txt.split(" ")[0];
+            
+            if (!dailyData[date]) {
+                dailyData[date] = {
+                    temps: [],
+                    humidity: [],
+                    windSpeed: [],
+                    pressure: [],
+                    weather: forecast.weather[0],
+                    dt_txt: forecast.dt_txt
+                };
             }
+            
+            dailyData[date].temps.push(forecast.main.temp);
+            dailyData[date].humidity.push(forecast.main.humidity);
+            dailyData[date].windSpeed.push(forecast.wind.speed);
+            dailyData[date].pressure.push(forecast.main.pressure);
+        });
+
+        // Convert to array and calculate aggregates
+        const fiveDaysForecast = Object.keys(dailyData).slice(0, 6).map(date => {
+            const dayData = dailyData[date];
+            return {
+                dt_txt: dayData.dt_txt,
+                date: date,
+                weather: [dayData.weather],
+                main: {
+                    temp: dayData.temps.reduce((a, b) => a + b, 0) / dayData.temps.length, // Average temp
+                    temp_max: Math.max(...dayData.temps), // Real max temp for the day
+                    temp_min: Math.min(...dayData.temps), // Real min temp for the day
+                    humidity: Math.round(dayData.humidity.reduce((a, b) => a + b, 0) / dayData.humidity.length),
+                    pressure: Math.round(dayData.pressure.reduce((a, b) => a + b, 0) / dayData.pressure.length),
+                    feels_like: dayData.temps[0] // Use first available for feels_like
+                },
+                wind: {
+                    speed: dayData.windSpeed.reduce((a, b) => a + b, 0) / dayData.windSpeed.length
+                }
+            };
         });
 
         // Clearing previous weather data
